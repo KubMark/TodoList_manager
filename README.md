@@ -22,7 +22,7 @@ poetry shell
 
 ## 3. Заполните .env файл следующими значениями
 ```sh
-SECRET_KEY=your_secret_key
+SECRET_KEY='your_secret_key'
 DEBUG=TrueDB_ENGINE=django.db.backends.engine
 DB_NAME=todolist
 DB_USER=todolist
