@@ -21,4 +21,4 @@ jobs:
         with:
           push: true
           file: Dockerfile.prod
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/TodoList_manager:${{ env.BRANCH_NAME }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/todolist_manager:${{ env.BRANCH_NAME }}
