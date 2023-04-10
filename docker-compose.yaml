@@ -30,7 +30,8 @@ services:
     volumes:
       - ./core:/todolist/core
       - ./todolist:/todolist/todolist
-      - django_static:/todolist/static
+      - django_statics:/todolist/static
+
 
   frontend:
     image: sermalenk/skypro-front:lesson-34
@@ -41,8 +42,8 @@ services:
         condition: service_started
     volumes:
       - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf
-      - django_static:/usr/share/nginx/html/static
+      - django_statics:/usr/share/nginx/html/static
 
 volumes:
   todomanager:
-  django_static:
+  django_statics:
