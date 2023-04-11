@@ -42,10 +42,10 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
-          script:
-            cd "todolist"
-            docker-compose pull
-            docker-compose up -d
+          script: |
+            cd todolist
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker-compose pull
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker-compose up -d
 
       - name: Cleanup
         if: always()
@@ -55,5 +55,5 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            docker system prune -a -f
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker system prune -a -f
           
