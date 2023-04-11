@@ -43,7 +43,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script:
-            cd "todolist"
+            cd "todolist/"
             docker-compose pull
             docker-compose up -d
 
