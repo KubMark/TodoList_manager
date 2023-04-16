@@ -7,6 +7,9 @@
 - Python 3.10
 - Django
 - PostgreSQL
+- Gunicorn
+- Nginx
+- Docker
 
 ## Установка
 
