@@ -4,7 +4,7 @@ from django.conf import settings
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("core/", include(('core.urls', 'core'))),
+    path("core/", include('core.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += [
