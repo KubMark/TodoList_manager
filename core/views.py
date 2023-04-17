@@ -21,3 +21,8 @@ class LoginView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def perform_create(self, serializer) -> None:
+        """ Происходит логин через cookies"""
+        user: User = serializer.save()
+        login(request=self.request, user=user)

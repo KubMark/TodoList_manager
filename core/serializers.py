@@ -41,17 +41,18 @@ class LoginSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
     password = PasswordField(required=True)
 
-    class Meta:
-        model = User
-        fileds = ['username', 'first_name', 'last_name', 'email', 'password']
-
-    def create(self, validated_data):
+    def create(self, validated_data: dict) -> User:
         if not (user := authenticate(
             username=validated_data['username'],
             password=validated_data['password']
         )):
             raise AuthenticationFailed
         return user
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'password')
+        read_only_fields = ('id', 'username', 'first_name', 'last_name', 'email')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
