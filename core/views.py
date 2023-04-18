@@ -1,10 +1,11 @@
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import User
-from core.serializers import CreateUserSerializer, LoginSerializer
+from core.serializers import CreateUserSerializer, LoginSerializer, ProfileSerializer, UpdatePasswordSerializer
 
 
 class CreateAccountView(CreateAPIView):
@@ -26,3 +27,27 @@ class LoginView(CreateAPIView):
         """ Происходит логин через cookies"""
         user: User = serializer.save()
         login(request=self.request, user=user)
+
+
+class ProfileView(RetrieveUpdateDestroyAPIView):
+    serializer_class = ProfileSerializer
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+    def delete(self, request, *args, **kwargs) -> Response:
+        logout(request)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UpdatePasswordView(UpdateAPIView):
+    serializer_class = UpdatePasswordSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self) -> User:
+        return self.request.user
+
+
+
