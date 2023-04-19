@@ -62,5 +62,19 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class UpdatePasswordSerializer(serializers.ModelSerializer):
-    old_password = PasswordField(required=True)
-    new_password = PasswordField(required=True)
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate(self, old_password: str) -> str:
+        if not self.instance.check_password(old_password):
+            raise ValidationError('Пароль не верный')
+        return old_password
+
+    def update(self, instance, validated_data):
+        instance.set_password(validated_data['new_password'])
+        return super().update(instance, validated_data)
+
+
+    class Meta:
+        model = User
+        fields = ('old_password', 'new_password')
