@@ -34,7 +34,7 @@ services:
 
 
   frontend:
-    image: sermalenk/skypro-front:lesson_35
+    image: sermalenk/skypro-front:lesson-35
     ports:
       - "80:80"
     depends_on:
