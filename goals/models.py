@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from core.models import User
 
+
 class DateModel(models.Model):
     created = models.DateTimeField(verbose_name="Дата создания")
     updated = models.DateTimeField(verbose_name="Дата последнего обновления")
