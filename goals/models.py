@@ -26,3 +26,6 @@ class GoalCategory(DateModel):
     title = models.CharField(verbose_name="Название", max_length=255)
     user = models.ForeignKey(User, verbose_name="Автор", on_delete=models.PROTECT)
     is_deleted = models.BooleanField(verbose_name="Удалена", default=False)
+
+    def __str__(self) -> str:
+        return self.title
