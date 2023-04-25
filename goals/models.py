@@ -47,6 +47,14 @@ class Goal(DateModel):
         verbose_name = "Цель"
         verbose_name_plural = "Цели"
 
-    title = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
-    category = models.ForeignKey(GoalCategory, on_delete=models.PROTECT, related_name='goals')
+    title = models.CharField(max_length=255, verbose_name='Название')
+    description = models.TextField(null=True, blank=True, verbose_name='Описание')
+    category = models.ForeignKey(GoalCategory, on_delete=models.PROTECT, verbose_name='Категория')
+
+    status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.to_do, verbose_name='Статус')
+    priority = models.PositiveSmallIntegerField(choices=Priority.choices, default=Priority.medium, verbose_name='Приоритет')
+    user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Автор')
+    due_date = models.DateTimeField(null=True, blank=True, verbose_name='Дата дедлайна')
+
+    def __str__(self):
+        return self.title
