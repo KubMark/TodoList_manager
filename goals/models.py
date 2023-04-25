@@ -29,3 +29,24 @@ class GoalCategory(DateModel):
 
     def __str__(self) -> str:
         return self.title
+
+class Goal(DateModel):
+    class Status(models.IntegerChoices):
+        to_do = 1, 'К выполнению'
+        in_progress = 2, 'В процессе'
+        done = 3, 'Выполнено'
+        archived = 4, 'Архив'
+
+    class Priority(models.IntegerChoices):
+        low = 1, 'Низкий'
+        medium = 2, 'Средний'
+        high = 3, 'Высокий'
+        critical = 4, 'Критический'
+
+    class Meta:
+        verbose_name = "Цель"
+        verbose_name_plural = "Цели"
+
+    title = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    category = models.ForeignKey(GoalCategory, on_delete=models.PROTECT, related_name='goals')
