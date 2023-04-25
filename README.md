@@ -30,6 +30,8 @@ DEBUG=True
 POSTGRES_USER=todolist
 POSTGRES_PASSWORD=todolist
 POSTGRES_DB=todolist
+VK_OAUTH2_KEY=
+VK_OAUTH2_SECRET=
 ```
 ## 4. Создать миграции.
 ```sh
