@@ -19,6 +19,7 @@ services:
 
   api:
     build: .
+    restart: always
     env_file: .env
     environment:
       POSTGRES_HOST: db
@@ -30,6 +31,7 @@ services:
     volumes:
       - ./core:/todolist/core
       - ./todolist:/todolist/todolist
+      - ./goals:/todolist/goals
       - django_static:/todolist/static
 
 

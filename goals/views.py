@@ -13,13 +13,13 @@ from goals.serializers import GoalCategoryCreateSerializer, GoalCategorySerializ
 # Category
 
 class GoalCategoryCreateView(CreateAPIView):
-    model = GoalCategory
+    queryset = GoalCategory.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = GoalCategoryCreateSerializer
 
 
 class GoalCategoryListView(ListAPIView):
-    model = GoalCategory
+    queryset = GoalCategory.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = GoalCategorySerializer
     filter_backends = [OrderingFilter, SearchFilter]
@@ -32,6 +32,7 @@ class GoalCategoryListView(ListAPIView):
 
 
 class GoalCategoryView(RetrieveUpdateDestroyAPIView):
+    queryset = GoalCategory.objects.all()
     serializer_class = GoalCategoryCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
