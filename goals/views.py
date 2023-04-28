@@ -6,7 +6,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 
 from goals.filters import GoalDateFilter
-from goals.models import GoalCategory, Goal
+from goals.models import GoalCategory, Goal, GoalComment
 from goals.serializers import GoalCategoryCreateSerializer, GoalCategorySerializer, GoalCreateSerializer, GoalSerializer
 
 
@@ -83,3 +83,10 @@ class GoalView(RetrieveUpdateDestroyAPIView):
         instance.status = Goal.Status.archived
         instance.save()
         return instance
+
+# Comments
+
+class CommentCreateView(CreateAPIView):
+    model = GoalComment
+    serializer_class = GoalCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
