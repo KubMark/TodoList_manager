@@ -58,3 +58,16 @@ class Goal(DateModel):
 
     def __str__(self):
         return self.title
+
+
+class GoalComment(DateModel):
+    class Meta:
+        verbose_name = "Коментарий"
+        verbose_name_plural = "Коментарии"
+
+    user = models.ForeignKey(User, verbose_name='Автор', on_delete=models.CASCADE)
+    goal = models.ForeignKey(Goal, verbose_name='Цель', on_delete=models.CASCADE)
+    text = models.TextField(verbose_name='Комментарий')
+
+    def __str__(self):
+        return self.text
