@@ -64,11 +64,9 @@ class GoalListView(ListAPIView):
     search_fields = ('title', 'description')
 
     def get_queryset(self):
-        return Goal.objects.select_related('category').filter(
-            Q(category__board__participants__user_id=self.request.user.id) &
-            ~Q(status=Goal.Status.archived) &
-            Q(category__is_deleted=False)
-        )
+        return Goal.objects.select_related('user').filter(
+            user=self.request.user, category__is_deleted=False
+        ).exclude(status=Goal.Status.archived)
 
 
 class GoalView(RetrieveUpdateDestroyAPIView):
@@ -77,11 +75,9 @@ class GoalView(RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Goal.objects.select_related('category').filter(
-            Q(category__board__participants__user_id=self.request.user.id) &
-            ~Q(status=Goal.Status.archived) &
-            Q(category__is_deleted=False)
-        )
+        return Goal.objects.select_related('user').filter(
+            user=self.request.user, category__is_deleted=False
+        ).exclude(status=Goal.Status.archived)
 
     def perform_destroy(self, instance):
         instance.status = Goal.Status.archived
