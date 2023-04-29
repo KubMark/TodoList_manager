@@ -17,6 +17,7 @@ services:
 
   api:
     image: kubmark/todolist_manager:latest
+    restart: always
     env_file: .env
     depends_on:
       db:
@@ -38,4 +39,6 @@ services:
 
 volumes:
   todomanager_12:
+    driver: local
   django_static:
+    driver: local
