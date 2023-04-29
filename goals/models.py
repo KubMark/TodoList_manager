@@ -24,9 +24,8 @@ class GoalCategory(DateModel):
         verbose_name_plural = "Категории"
 
     title = models.CharField(verbose_name="Название", max_length=255)
-    user = models.ForeignKey(User, verbose_name="Автор", on_delete=models.PROTECT)
+    user = models.ForeignKey(User, verbose_name="Автор", on_delete=models.PROTECT, related_name='goal_category')
     is_deleted = models.BooleanField(verbose_name="Удалена", default=False)
-    board = models.ForeignKey(Board, verbose_name="Доска", on_delete=models.PROTECT)
 
     def __str__(self) -> str:
         return self.title
@@ -67,37 +66,11 @@ class GoalComment(DateModel):
         verbose_name = "Коментарий"
         verbose_name_plural = "Коментарии"
 
-    user = models.ForeignKey(User, verbose_name='Автор', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, verbose_name='Автор', on_delete=models.PROTECT)
     goal = models.ForeignKey(Goal, verbose_name='Цель', on_delete=models.CASCADE)
     text = models.TextField(verbose_name='Комментарий')
 
     def __str__(self):
         return self.text
-
-
-class Board(DateModel):
-    class Meta:
-        verbose_name = "Доска"
-        verbose_name_plural = "Доски"
-
-    is_deleted = models.BooleanField(verbose_name="Удалена", default=False)
-    title = models.CharField(verbose_name="Название", max_length=100)
-
-    def __str__(self):
-        return self.title
-
-
-class BoardParticipant(DateModel):
-    class Meta:
-        unique_together = ('board', 'user')
-        verbose_name = 'Участник'
-        verbose_name_plural = 'Участники'
-
-    class Role(models.IntegerChoices):
-        owner = 1, 'Владелец'
-        writer = 2, 'Редактор'
-        reader = 3, 'Читатель'
-
-    role = models.SmallIntegerField(choices=Role.choices, default=Role.owner, verbose_name="Роль")
-    user = models.ForeignKey(User, verbose_name="Участник",on_delete=models.PROTECT, related_name="participants")
-    board = models.ForeignKey(Board, verbose_name="Доска",on_delete=models.PROTECT, related_name="participants")

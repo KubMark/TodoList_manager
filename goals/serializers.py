@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, PermissionDenied
 
 from core.serializers import ProfileSerializer
-from goals.models import GoalCategory, Goal, BoardParticipant, GoalComment, Board
+from goals.models import GoalCategory, Goal, GoalComment
 
 
 # Category
@@ -48,6 +48,7 @@ class GoalSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'created', 'updated', 'user')
         fields = '__all__'
 
+
 # Comment
 class GoalCommentCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -58,10 +59,15 @@ class GoalCommentCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_goal(self, value: Goal):
-        if not BoardParticipant.objects.filter(
-            role__in=(BoardParticipant.Role.owner, BoardParticipant.Role.writer),
-            board=value.category.board.id,
-            user_id=self.context['request'].user.id
-        ):
-            raise ValidationError('У вас нет доступа для создания комментариев')
+        if self.context['request'].user.id != value.user_id:
+            raise PermissionDenied
         return value
+
+
+class GoalCommentSerializer(serializers.ModelSerializer):
+    user = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = GoalComment
+        read_only_fields = ('id', 'created', 'updated', 'user')
+        fields = '__all__'

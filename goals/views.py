@@ -1,5 +1,4 @@
 from django.db import transaction
-from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -7,7 +6,8 @@ from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDe
 
 from goals.filters import GoalDateFilter
 from goals.models import GoalCategory, Goal, GoalComment
-from goals.serializers import GoalCategoryCreateSerializer, GoalCategorySerializer, GoalCreateSerializer, GoalSerializer
+from goals.serializers import GoalCategoryCreateSerializer, GoalCategorySerializer, GoalCreateSerializer, \
+    GoalSerializer, GoalCommentSerializer, GoalCommentCreateSerializer
 
 
 # Category
@@ -47,6 +47,7 @@ class GoalCategoryView(RetrieveUpdateDestroyAPIView):
 
 
 # Goal
+
 class GoalCreateView(CreateAPIView):
     model = Goal
     serializer_class = GoalCreateSerializer
@@ -84,9 +85,34 @@ class GoalView(RetrieveUpdateDestroyAPIView):
         instance.save()
         return instance
 
+
 # Comments
 
 class CommentCreateView(CreateAPIView):
-    model = GoalComment
-    serializer_class = GoalCreateSerializer
+    # model = GoalComment
+    queryset = GoalComment.objects.all()
+    serializer_class = GoalCommentCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class CommentListView(ListAPIView):
+    # model = GoalComment
+    queryset = GoalComment.objects.all()
+    serializer_class = GoalCommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    ordering_fields = ('created', )
+    ordering = ('-created', )
+
+    def get_queryset(self):
+        return GoalCategory.objects.filter(user=self.request.user)
+
+
+class CommentView(RetrieveUpdateDestroyAPIView):
+    # model = GoalComment
+    queryset = GoalComment.objects.all()
+    serializer_class = GoalCommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return GoalCategory.objects.filter(user=self.request.user)
