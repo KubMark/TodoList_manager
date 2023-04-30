@@ -18,8 +18,10 @@ class GoalAdmin(admin.ModelAdmin):
     list_filter = ('created', 'updated', )
     readonly_fields = ('created', 'updated', )
 
+
 @admin.register(GoalComment)
 class GoalCommentAdmin(admin.ModelAdmin):
     list_display = ('user', 'text', )
     list_filter = ('created', 'updated', )
     readonly_fields = ('created', 'updated', )
+
