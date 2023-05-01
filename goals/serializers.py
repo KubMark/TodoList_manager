@@ -83,6 +83,16 @@ class BoardCreateSerializer(serializers.ModelSerializer):
 # Category
 class GoalCategoryCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    ''' Board field validation'''
+    def validate_board(self, board: Board):
+        if board.is_deleted:
+            raise ValidationError('Cannot create category in archived board')
+        if not BoardParticipant.objects.filter(
+                role__in=(BoardParticipant.Role.owner, BoardParticipant.Role.writer),
+                board_id=board.id,
+                user_id=self.context['request'].user.id):
+            raise ValidationError('You dont have permission create category in this board')
+        return board
 
     class Meta:
         model = GoalCategory
@@ -92,6 +102,7 @@ class GoalCategoryCreateSerializer(serializers.ModelSerializer):
 
 class GoalCategorySerializer(serializers.ModelSerializer):
     user = ProfileSerializer(read_only=True)
+    board = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = GoalCategory
@@ -102,7 +113,7 @@ class GoalCategorySerializer(serializers.ModelSerializer):
 # Goal
 class GoalCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
+    ''' Category field validation'''
     class Meta:
         model = Goal
         read_only_fields = ('id', 'created', 'updated', 'user')
@@ -128,7 +139,7 @@ class GoalSerializer(serializers.ModelSerializer):
 # Comment
 class GoalCommentCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
+    ''' Goal field validation'''
     class Meta:
         model = GoalComment
         read_only_fields = ('id', 'created', 'updated', 'user')

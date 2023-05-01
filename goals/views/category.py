@@ -1,4 +1,5 @@
 from django.db import transaction
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
@@ -16,16 +17,17 @@ class GoalCategoryCreateView(CreateAPIView):
 
 
 class GoalCategoryListView(ListAPIView):
-    queryset = GoalCategory.objects.all()
+    model = GoalCategory
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = GoalCategorySerializer
-    filter_backends = [OrderingFilter, SearchFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    filterset_fields = ['board']
     ordering_fields = ('title', 'created')
     ordering = ['title']
     search_fields = ['title']
 
     def get_queryset(self):
-        return GoalCategory.objects.select_related('user').filter(user=self.request.user, is_deleted=False)
+        return GoalCategory.objects.filter(board__participants__user=self.request.user).exclude(is_deleted=True)
 
 
 class GoalCategoryView(RetrieveUpdateDestroyAPIView):
