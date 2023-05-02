@@ -4,6 +4,7 @@ from rest_framework import permissions
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from goals.models import GoalComment
+from goals.permissions import CommentPermissions
 from goals.serializers import GoalCommentSerializer, GoalCommentCreateSerializer
 
 # Comments
@@ -12,7 +13,7 @@ from goals.serializers import GoalCommentSerializer, GoalCommentCreateSerializer
 class CommentCreateView(CreateAPIView):
     queryset = GoalComment.objects.all()
     serializer_class = GoalCommentCreateSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, CommentPermissions]
 
 
 class CommentListView(ListAPIView):
@@ -28,6 +29,9 @@ class CommentListView(ListAPIView):
 
 
 class CommentView(RetrieveUpdateDestroyAPIView):
-    queryset = GoalComment.objects.all()
+    model = GoalComment
     serializer_class = GoalCommentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, CommentPermissions]
+
+    def get_queryset(self) -> QuerySet[GoalComment]:
+        return GoalComment.objects.select_related('user').filter(user_id=self.request.user.id)
