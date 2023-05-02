@@ -10,7 +10,7 @@ from goals.serializers import GoalCreateSerializer, GoalSerializer
 
 
 class GoalCreateView(CreateAPIView):
-    model = Goal
+    queryset = Goal.objects.all()
     serializer_class = GoalCreateSerializer
     permission_classes = [permissions.IsAuthenticated, GoalPermissions]
 

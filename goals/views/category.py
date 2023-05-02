@@ -19,42 +19,27 @@ class GoalCategoryCreateView(CreateAPIView):
     serializer_class = GoalCategoryCreateSerializer
 
 
-# class GoalCategoryListView(ListAPIView):
-#     model = GoalCategory
-#     permission_classes = [CategoryPermissions]
-#     serializer_class = GoalCategorySerializer
-#     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
-#     filterset_fields = ['board']
-#     ordering_fields = ('title', 'created')
-#     ordering = ['title']
-#     search_fields = ['title']
-#
-#     def get_queryset(self):
-#         return GoalCategory.objects.filter(board__participants__user=self.request.user).exclude(is_deleted=True)
 class GoalCategoryListView(ListAPIView):
     model = GoalCategory
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [CategoryPermissions]
     serializer_class = GoalCategorySerializer
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.OrderingFilter,
-        filters.SearchFilter,
-    ]
-    filterset_class = CategoryBoardFilter
-    ordering_fields = ["title", "created"]
-    ordering = ["-created"]
-    search_fields = ["title"]
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    filterset_fields = ['board']
+    ordering_fields = ('title', 'created')
+    ordering = ['title']
+    search_fields = ['title']
 
-    def get_queryset(self) -> QuerySet:
-        return GoalCategory.objects.filter(board__participants__user=self.request.user, is_deleted=False)
+    def get_queryset(self) -> QuerySet[GoalCategory]:
+        return GoalCategory.objects.filter(board__participants__user=self.request.user).exclude(is_deleted=True)
 
 class GoalCategoryView(RetrieveUpdateDestroyAPIView):
-    queryset = GoalCategory.objects.all()
+    model = GoalCategory
     serializer_class = GoalCategoryCreateSerializer
     permission_classes = [permissions.IsAuthenticated, CategoryPermissions]
 
     def get_queryset(self):
-        return GoalCategory.objects.select_related('user').filter(user=self.request.user, is_deleted=False)
+        return GoalCategory.objects.select_related('user').filter(
+            user=self.request.user, is_deleted=False)
 
     def perform_destroy(self, instance: GoalCategory) -> GoalCategory:
         with transaction.atomic():
