@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from goals.models import GoalCategory, Goal, Board, GoalComment, BoardParticipant
 
 
-class BoardPermissions(permissions.BasePermission):
+class BoardPermissions(permissions.IsAuthenticated):
     def has_object_permission(self, request, view, obj: Board):
         if request.method in permissions.SAFE_METHODS:
             return BoardParticipant.objects.filter(user_id=request.user.id, board_id=obj).exists()
@@ -14,7 +14,7 @@ class BoardPermissions(permissions.BasePermission):
             role=BoardParticipant.Role.owner).exists()
 
 
-class CategoryPermissions(permissions.BasePermission):
+class CategoryPermissions(permissions.IsAuthenticated):
     def has_object_permission(self, request, view, obj: GoalCategory):
         if request.method in permissions.SAFE_METHODS:
             return BoardParticipant.objects.filter(user_id=request.user.id, board_id=obj.board.id).exists()
