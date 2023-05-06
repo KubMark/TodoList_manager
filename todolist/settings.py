@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # my apps
     "core.apps.CoreConfig",
     "goals.apps.GoalsConfig",
+    "bot.apps.BotConfig",
 
 ]
 
@@ -144,5 +145,6 @@ SOCIAL_AUTH_VK_EXTRA_DATA = [('email', 'email')]
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/login-error/'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination'
-}
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination'}
+
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
