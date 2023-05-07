@@ -17,7 +17,7 @@ class Command(BaseCommand):
             res = self.tg_client.get_updates(offset=offset)
             for item in res.result:
                 offset = item.update_id + 1
-                self.handle_message(item.message)
+                self.handle_message(msg=item.message)
 
     def handle_message(self, msg: Message):
         tg_user, created = TgUser.objects.get_or_create(tg_chat_id=msg.chat.id)
