@@ -27,6 +27,7 @@ class Command(BaseCommand):
             self.handle_unauthorized(tg_user, msg)
 
     def handle_authorized(self, tg_user: TgUser, msg: Message):
+
         self.tg_client.send_message(chat_id=msg.chat.id, text=f'Hello, {tg_user.user.username}!')
 
 
