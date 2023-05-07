@@ -2,12 +2,13 @@ import logging
 import requests
 from pydantic import ValidationError
 from bot.tg.dc import GetUpdatesResponse, SendMessageResponse
+from todolist import settings
 
 logger = logging.getLogger(__name__)
 
 
 class TgClient:
-    def __init__(self, token: str):
+    def __init__(self, token: str = settings.TELEGRAM_TOKEN):
         self.token = token
 
     def get_url(self, method: str):
@@ -21,14 +22,13 @@ class TgClient:
         try:
             return GetUpdatesResponse(**data)
         except ValidationError:
-            logger.error(f'Пришли не верные данные: {data}')
-
+            logger.error(f'Пришли неверные данные: {data}')
 
     def send_message(self, chat_id: int, text: str) -> SendMessageResponse:
         """Requests TG bot using sendMessage"""
-        response = requests.get(self.get_url('SendMessage'), params={'chat_id': chat_id, 'text': text}).json()
+        response = requests.get(self.get_url('SendMessage'), params={'chat_id': chat_id, 'text': text})
         data = response.json()
         try:
             return SendMessageResponse(**data)
         except ValidationError:
-            logger.error(f'Пришли не верные данные: {data}')
+            logger.error(f'Пришли неверные данные: {data}')
