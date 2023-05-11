@@ -1,54 +1,39 @@
-import logging
-import requests
-from pydantic import ValidationError
-from bot.tg.dc import GetUpdatesResponse, SendMessageResponse
-<<<<<<< HEAD
-from todolist import settings
-=======
->>>>>>> origin/dev38_telegram_bot
+from enum import Enum
+from typing import Any
 
-logger = logging.getLogger(__name__)
+import requests
+
+from bot.tg.dc import GetUpdatesResponse, SendMessageResponse
+
+
+class Command(str, Enum):
+    GET_UPDATES = 'getUpdates'
+    SEND_MESSAGE = 'sendMessage'
 
 
 class TgClient:
-<<<<<<< HEAD
-    def __init__(self, token: str = settings.TELEGRAM_TOKEN):
-=======
-    def __init__(self, token: str):
->>>>>>> origin/dev38_telegram_bot
-        self.token = token
 
-    def get_url(self, method: str):
-        """Returns url to TG bot in str format with requested method"""
-        return f"https://api.telegram.org/bot{self.token}/{method}"
+    def __init__(self, token: str):
+        self.__token = token
+
+    @property
+    def token(self) -> str:
+        return self.__token
 
     def get_updates(self, offset: int = 0, timeout: int = 60) -> GetUpdatesResponse:
-        """Requests TG bot using getUpdates"""
-        response = requests.get(self.get_url('getUpdates'), params={'timeout': timeout, 'offset': offset})
-        data = response.json()
-        try:
-            return GetUpdatesResponse(**data)
-        except ValidationError:
-<<<<<<< HEAD
-            logger.error(f'Пришли неверные данные: {data}')
+        data = self._get(Command.GET_UPDATES, offset=offset, timeout=timeout)
+        return GetUpdatesResponse(**data)
 
     def send_message(self, chat_id: int, text: str) -> SendMessageResponse:
-        """Requests TG bot using sendMessage"""
-        response = requests.get(self.get_url('SendMessage'), params={'chat_id': chat_id, 'text': text})
-=======
-            logger.error(f'Пришли не верные данные: {data}')
+        data = self._get(Command.SEND_MESSAGE, chat_id=chat_id, text=text)
+        return SendMessageResponse(**data)
 
+    def get_url(self, command: Command):
+        return f'https://api.telegram.org/bot{self.token}/{command.value}'
 
-    def send_message(self, chat_id: int, text: str) -> SendMessageResponse:
-        """Requests TG bot using sendMessage"""
-        response = requests.get(self.get_url('SendMessage'), params={'chat_id': chat_id, 'text': text}).json()
->>>>>>> origin/dev38_telegram_bot
-        data = response.json()
-        try:
-            return SendMessageResponse(**data)
-        except ValidationError:
-<<<<<<< HEAD
-            logger.error(f'Пришли неверные данные: {data}')
-=======
-            logger.error(f'Пришли не верные данные: {data}')
->>>>>>> origin/dev38_telegram_bot
+    def _get(self, command: Command, **params: Any) -> dict:
+        url = self.get_url(command)
+        response = requests.get(url, params=params)
+        if not response.ok:
+            raise ValueError
+        return response.json()

@@ -35,6 +35,15 @@ services:
       - ./bot:/todolist/bot
       - django_static:/todolist/static
 
+  telegram_bot:
+    build: .
+    env_file: .env
+    environment:
+      POSTGRES_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+    command: python manage.py runbot
 
   frontend:
     image: sermalenk/skypro-front:lesson-38
