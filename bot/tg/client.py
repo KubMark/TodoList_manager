@@ -1,37 +1,39 @@
-import logging
-import requests
-from pydantic import ValidationError
-from bot.tg.dc import GetUpdatesResponse, SendMessageResponse
-from todolist import settings
+from enum import Enum
+from typing import Any
 
-logger = logging.getLogger(__name__)
+import requests
+
+from bot.tg.dc import GetUpdatesResponse, SendMessageResponse
+
+
+class Command(str, Enum):
+    GET_UPDATES = 'getUpdates'
+    SEND_MESSAGE = 'sendMessage'
 
 
 class TgClient:
-    def __init__(self, token: str = settings.TELEGRAM_TOKEN):
-        self.token = token
 
-    def get_url(self, method: str):
-        """Returns url to TG bot in str format with requested method"""
-        return f"https://api.telegram.org/bot{self.token}/{method}"
+    def __init__(self, token: str):
+        self.__token = token
+
+    @property
+    def token(self) -> str:
+        return self.__token
 
     def get_updates(self, offset: int = 0, timeout: int = 60) -> GetUpdatesResponse:
-        """Requests TG bot using getUpdates"""
-        response = requests.get(self.get_url('getUpdates'), params={'timeout': timeout, 'offset': offset})
-        data = response.json()
-        try:
-            return GetUpdatesResponse(**data)
-        except ValidationError:
-
-            logger.error(f'Пришли неверные данные: {data}')
+        data = self._get(Command.GET_UPDATES, offset=offset, timeout=timeout)
+        return GetUpdatesResponse(**data)
 
     def send_message(self, chat_id: int, text: str) -> SendMessageResponse:
-        """Requests TG bot using sendMessage"""
-        response = requests.get(self.get_url('SendMessage'), params={'chat_id': chat_id, 'text': text}).json()
-        data = response.json()
-        try:
-            return SendMessageResponse(**data)
-        except ValidationError:
+        data = self._get(Command.SEND_MESSAGE, chat_id=chat_id, text=text)
+        return SendMessageResponse(**data)
 
-            logger.error(f'Пришли неверные данные: {data}')
+    def get_url(self, command: Command):
+        return f'https://api.telegram.org/bot{self.token}/{command.value}'
 
+    def _get(self, command: Command, **params: Any) -> dict:
+        url = self.get_url(command)
+        response = requests.get(url, params=params)
+        if not response.ok:
+            raise ValueError
+        return response.json()

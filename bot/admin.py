@@ -4,5 +4,5 @@ from bot.models import TgUser
 
 @admin.register(TgUser)
 class TgUserAdmin(admin.ModelAdmin):
-    list_display = ('tg_chat_id', 'user')
-    readonly_fields = ('tg_chat_id', 'verification_code')
+    list_display = ('chat_id', 'user')
+    readonly_fields = ('verification_code', )

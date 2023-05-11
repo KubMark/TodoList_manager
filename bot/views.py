@@ -1,6 +1,6 @@
 from typing import Any
-
-from rest_framework.exceptions import AuthenticationFailed
+from django.conf import settings
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -20,14 +20,17 @@ class VerificationCodeView(GenericAPIView):
         serializer: TgUserSerializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        try:
-            tg_user = TgUser.objects.get(verification_code=serializer.validated_data['verification_code'])
-        except TgUser.DoesNotExist:
-            raise AuthenticationFailed
-
+        tg_user = self._get_tg_user(serializer.validated_data['verification_code'])
         tg_user.user = request.user
         tg_user.save()
 
-        TgClient().send_message(chat_id=tg_user.tg_chat_id, text='Congratulations you have been verified')
+        TgClient(settings.TELEGRAM_TOKEN).send_message(tg_user.chat_id, 'You have been successfully verified')
+
         return Response(TgUserSerializer(tg_user).data)
 
+    @staticmethod
+    def _get_tg_user(verification_code: str) -> TgUser:
+        try:
+            return TgUser.objects.get(verification_code=verification_code)
+        except TgUser.DoesNotExist:
+            raise NotFound('Wrong verification number')
