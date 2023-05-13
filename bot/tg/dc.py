@@ -14,6 +14,7 @@ class UpdateObj(BaseModel):
     update_id: int
     message: Message
 
+
 class SendMessageResponse(BaseModel):
     ok: bool
     result: Message
