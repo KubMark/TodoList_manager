@@ -4,7 +4,7 @@ on:
   push:
     branches-ignore:
       - main
-
+      - dev38_telegram_bot
 jobs:
   build:
     runs-on: ubuntu-latest

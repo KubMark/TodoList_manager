@@ -28,7 +28,7 @@ class Command(BaseCommand):
                     self.handle_message(item.edited_message)
 
     def handle_message(self, msg: Message):
-        tg_user, created = TgUser.objects.get_or_create(tg_chat_id=msg.chat.id)
+        tg_user, created = TgUser.objects.get_or_create(chat_id=msg.chat.id)
         if tg_user.user:
             self.handle_authorized(tg_user, msg)
         else:
@@ -39,13 +39,13 @@ class Command(BaseCommand):
         if msg.text in allowed_commands:
             self.handle_command(tg_user, msg)
         elif ('user' not in states) and (msg.text not in allowed_commands):
-            self.tg_client.send_message(tg_user.tg_chat_id, 'Command not found')
+            self.tg_client.send_message(tg_user.chat_id, 'Command not found')
         elif (msg.text not in allowed_commands) and (states['user']) and \
                 ('category' not in states):
             category = self.handle_save_category(tg_user, msg.text)
             if category:
                 states['category'] = category
-                self.tg_client.send_message(tg_user.tg_chat_id,
+                self.tg_client.send_message(tg_user.chat_id,
                                             f'You choosed {category.title}, category, please enter name for your goal')
         elif (msg.text not in allowed_commands) and (states['user']) and \
                 (states['category']) and ('goal_title' not in states):
@@ -53,7 +53,7 @@ class Command(BaseCommand):
             goal = Goal.objects.create(title=states['goal_title'],
                                        user=states['user'],
                                        category=states['category'])
-            self.tg_client.send_message(tg_user.tg_chat_id, f'Your goal {goal} has been created')
+            self.tg_client.send_message(tg_user.chat_id, f'Your goal {goal} has been created')
             del states['user']
             del states['category']
             del states['goal_title']
@@ -64,7 +64,7 @@ class Command(BaseCommand):
         code = os.urandom(12).hex()
         tg_user.verification_code = code
         tg_user.save(update_fields=['verification_code'])
-        self.tg_client.send_message(tg_user.tg_chat_id, f'Hello! Your verification code: {code}')
+        self.tg_client.send_message(tg_user.chat_id, f'Hello! Your verification code: {code}')
 
     def handle_command(self, tg_user: TgUser, msg: Message):
         match msg.text:
@@ -83,17 +83,17 @@ class Command(BaseCommand):
             self.tg_client.send_message('Goals not found')
         else:
             resp = '\n'.join([goal.title for goal in goals])
-            self.tg_client.send_message(tg_user.tg_chat_id, resp)
+            self.tg_client.send_message(tg_user.chat_id, resp)
 
     def handle_categories(self, tg_user: TgUser):
         categories = GoalCategory.objects.filter(board__participants__user=tg_user.user, is_deleted=False)
 
         if not categories:
-            self.tg_client.send_message(tg_user.tg_chat_id, 'Categories not found')
+            self.tg_client.send_message(tg_user.chat_id, 'Categories not found')
         else:
             resp = '\n'.join([f'{cat.id}: {cat.title}' for cat in categories])
-            self.tg_client.send_message(tg_user.tg_chat_id, 'PLease choose category number for your Goal')
-            self.tg_client.send_message(tg_user.tg_chat_id, resp)
+            self.tg_client.send_message(tg_user.chat_id, 'PLease choose category number for your Goal')
+            self.tg_client.send_message(tg_user.chat_id, resp)
             if 'user' not in states:
                 states['user'] = tg_user.user
 
@@ -109,4 +109,4 @@ class Command(BaseCommand):
             del states['category']
         if 'goal_title' in states:
             del states['goal_title']
-        self.tg_client.send_message(tg_user.tg_chat_id, 'Cancel')
+        self.tg_client.send_message(tg_user.chat_id, 'Cancel')
