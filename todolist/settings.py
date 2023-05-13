@@ -45,9 +45,9 @@ INSTALLED_APPS = [
     "django_filters",
     "social_django",
     # my apps
-    "core.apps.CoreConfig",
-    "goals.apps.GoalsConfig",
-    "bot.apps.BotConfig",
+    "core",
+    "goals",
+    "bot",
 
 ]
 
@@ -66,8 +66,7 @@ ROOT_URLCONF = "todolist.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'templates']
-        ,
+        "DIRS": [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

@@ -4,7 +4,7 @@ on:
   push:
     branches-ignore:
       - master
-#      - dev38_telegram_bot
+      - dev38_telegram_bot
 
 jobs:
   build:
