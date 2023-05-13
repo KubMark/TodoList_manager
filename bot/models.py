@@ -8,6 +8,6 @@ class TgUser(models.Model):
         verbose_name = 'Телеграм-пользователь'
         verbose_name_plural = 'Телеграм-пользователи'
 
-    chat_id = models.BigIntegerField(unique=True)
+    tg_chat_id = models.BigIntegerField(unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, default=None)
     verification_code = models.CharField(max_length=50, default=None, null=True, blank=True)

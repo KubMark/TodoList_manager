@@ -24,7 +24,7 @@ class VerificationCodeView(GenericAPIView):
         tg_user.user = request.user
         tg_user.save()
 
-        TgClient(settings.TELEGRAM_TOKEN).send_message(tg_user.chat_id, 'You have been successfully verified')
+        TgClient(settings.TELEGRAM_TOKEN).send_message(tg_user.tg_chat_id, 'You have been successfully verified')
 
         return Response(TgUserSerializer(tg_user).data)
 
