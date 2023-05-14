@@ -32,8 +32,14 @@ class Command(BaseCommand):
         else:
             self.handle_unauthorized(tg_user, msg)
 
+    def handle_unauthorized(self, tg_user: TgUser, msg: Message):
+
+        self.tg_client.send_message(msg.chat.id, 'Please confirm your account')
+        code = tg_user.set_verification_code()
+        self.tg_client.send_message(tg_user.chat_id, f'Hello! Your verification code: {code}')
+
     def handle_authorized(self, tg_user: TgUser, msg: Message):
-        allowed_commands = ['/goals', '/create', '/cancel']
+        allowed_commands: list[str] = ['/goals', '/create', '/cancel']
         if '/goals' in msg.text:
             self.get_goals(msg, tg_user)
 
@@ -53,6 +59,7 @@ class Command(BaseCommand):
                 states['category'] = category
                 self.tg_client.send_message(tg_user.chat_id,
                                             f'You choosed {category.title}, category, please enter name for your goal')
+
         elif (msg.text not in allowed_commands) and (states['user']) and \
                 (states['category']) and ('goal_title' not in states):
             states['goal_title'] = msg.text
@@ -64,12 +71,7 @@ class Command(BaseCommand):
             del states['category']
             del states['goal_title']
             cat_id.clear()
-
-    def handle_unauthorized(self, tg_user: TgUser, msg: Message):
-
-        self.tg_client.send_message(msg.chat.id, 'Please confirm your account')
-        code = tg_user.set_verification_code()
-        self.tg_client.send_message(tg_user.chat_id, f'Hello! Your verification code: {code}')
+            self.tg_client.send_message(chat_id=tg_user.chat_id, text="Unknown command")
 
     def get_goals(self, msg: Message, tg_user: TgUser):
         goals = Goal.objects.filter(user=tg_user.user)
@@ -88,7 +90,7 @@ class Command(BaseCommand):
                 cat_id.append(cat.id)
             self.tg_client.send_message(
                 chat_id=tg_user.chat_id,
-                text=f'Please choose Category number for your Goal\n{category_list}')
+                text=f'Please choose the Category, to create goal\n{category_list}')
             if 'user' not in states:
                 states['user'] = tg_user.user
         else:
@@ -96,9 +98,16 @@ class Command(BaseCommand):
                                                      'on website for your goals')
 
     def handle_save_category(self, tg_user: TgUser, msg: str):
-        category_id = int(msg)
-        category_data = GoalCategory.objects.filter(user=tg_user.user).get(pk=category_id)
-        return category_data
+        messg = f'Please select number, not the title of Category'
+        try:
+            category_id = int(msg)
+            category_data = GoalCategory.objects.filter(user=tg_user.user).get(pk=category_id)
+            return category_data
+        except ValueError:
+            self.tg_client.send_message(chat_id=tg_user.chat_id, text=messg)
+            return None
+
+
 
     def get_cancel(self, tg_user: TgUser):
         if 'user' in states:
