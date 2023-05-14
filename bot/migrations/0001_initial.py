@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("tg_chat_id", models.BigIntegerField(unique=True)),
+                ("chat_id", models.BigIntegerField(unique=True)),
                 (
                     "verification_code",
                     models.CharField(
