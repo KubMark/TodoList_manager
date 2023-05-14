@@ -1,10 +1,13 @@
+import logging
 from enum import Enum
 from typing import Any
-
+from django.conf import settings
 import requests
+from pydantic import ValidationError
 
 from bot.tg.dc import GetUpdatesResponse, SendMessageResponse
 
+logger = logging.getLogger(__name__)
 
 class Command(str, Enum):
     GET_UPDATES = 'getUpdates'
@@ -13,16 +16,16 @@ class Command(str, Enum):
 
 class TgClient:
 
-    def __init__(self, token: str):
-        self.__token = token
-
-    @property
-    def token(self) -> str:
-        return self.__token
+    def __init__(self, token: str = settings.TELEGRAM_TOKEN):
+        self.token = token
 
     def get_updates(self, offset: int = 0, timeout: int = 60) -> GetUpdatesResponse:
         data = self._get(Command.GET_UPDATES, offset=offset, timeout=timeout)
-        return GetUpdatesResponse(**data)
+        try:
+            return GetUpdatesResponse(**data)
+        except ValidationError:
+            logger.warning(data)
+            return GetUpdatesResponse(ok=False, result=[])
 
     def send_message(self, chat_id: int, text: str) -> SendMessageResponse:
         data = self._get(Command.SEND_MESSAGE, chat_id=chat_id, text=text)
