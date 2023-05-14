@@ -5,10 +5,10 @@ from bot.tg.client import TgClient
 from bot.tg.dc import Message
 from goals.models import Goal, GoalCategory
 from todolist import settings
-import os
 
 states = {}
 cat_id = []
+
 
 class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
@@ -68,9 +68,7 @@ class Command(BaseCommand):
     def handle_unauthorized(self, tg_user: TgUser, msg: Message):
 
         self.tg_client.send_message(msg.chat.id, 'Please confirm your account')
-        code = os.urandom(12).hex()
-        tg_user.verification_code = code
-        tg_user.save(update_fields=['verification_code'])
+        code = tg_user.set_verification_code()
         self.tg_client.send_message(tg_user.chat_id, f'Hello! Your verification code: {code}')
 
     def get_goals(self, msg: Message, tg_user: TgUser):
@@ -79,7 +77,7 @@ class Command(BaseCommand):
             response = [f'#{item.id} {item.title}' for item in goals]
             self.tg_client.send_message(msg.chat.id, '\n'.join(response))
         else:
-            self.tg_client.send_message(msg.chat.id, 'Goals not found')
+            self.tg_client.send_message(msg.chat.id, 'No Goals to display, create one with /create command')
 
     def handle_categories(self, msg, tg_user: TgUser):
         categories = GoalCategory.objects.filter(user=tg_user.user, is_deleted=False)
@@ -90,7 +88,7 @@ class Command(BaseCommand):
                 cat_id.append(cat.id)
             self.tg_client.send_message(
                 chat_id=tg_user.chat_id,
-                text=f'Выберите номер категории для новой цели:\n{category_list}')
+                text=f'Please choose Category number for your Goal\n{category_list}')
             if 'user' not in states:
                 states['user'] = tg_user.user
         else:
