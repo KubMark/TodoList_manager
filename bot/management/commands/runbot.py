@@ -71,7 +71,6 @@ class Command(BaseCommand):
             del states['category']
             del states['goal_title']
             cat_id.clear()
-            self.tg_client.send_message(chat_id=tg_user.chat_id, text="Unknown command")
 
     def get_goals(self, msg: Message, tg_user: TgUser):
         goals = Goal.objects.filter(user=tg_user.user)
