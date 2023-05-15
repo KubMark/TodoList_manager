@@ -1,11 +1,10 @@
 from django.db import transaction
 from django.db.models import QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import permissions, filters
+from rest_framework import permissions
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 
-from goals.filters import CategoryBoardFilter
 from goals.models import GoalCategory
 from goals.permissions import CategoryPermissions
 from goals.serializers import GoalCategoryCreateSerializer, GoalCategorySerializer
@@ -31,6 +30,7 @@ class GoalCategoryListView(ListAPIView):
 
     def get_queryset(self) -> QuerySet[GoalCategory]:
         return GoalCategory.objects.filter(board__participants__user=self.request.user).exclude(is_deleted=True)
+
 
 class GoalCategoryView(RetrieveUpdateDestroyAPIView):
     model = GoalCategory

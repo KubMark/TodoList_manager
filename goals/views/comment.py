@@ -19,7 +19,7 @@ class CommentCreateView(CreateAPIView):
 class CommentListView(ListAPIView):
     model = GoalComment
     serializer_class = GoalCommentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [CommentPermissions]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ('goal', )
     ordering = ('-created', )

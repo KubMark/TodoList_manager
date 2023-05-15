@@ -73,7 +73,8 @@ class Command(BaseCommand):
             cat_id.clear()
 
     def get_goals(self, msg: Message, tg_user: TgUser):
-        goals = Goal.objects.filter(user=tg_user.user)
+        goals = Goal.objects.filter(user=tg_user.user).exclude(status=Goal.Status.archived)
+
         if goals.count() > 0:
             response = [f'#{item.id} {item.title}' for item in goals]
             self.tg_client.send_message(msg.chat.id, '\n'.join(response))
@@ -97,7 +98,7 @@ class Command(BaseCommand):
                                                      'on website for your goals')
 
     def handle_save_category(self, tg_user: TgUser, msg: str):
-        messg = f'Please select number, not the title of Category'
+        messg = f'Unknown command'
         try:
             category_id = int(msg)
             category_data = GoalCategory.objects.filter(user=tg_user.user).get(pk=category_id)
@@ -105,8 +106,6 @@ class Command(BaseCommand):
         except ValueError:
             self.tg_client.send_message(chat_id=tg_user.chat_id, text=messg)
             return None
-
-
 
     def get_cancel(self, tg_user: TgUser):
         if 'user' in states:
